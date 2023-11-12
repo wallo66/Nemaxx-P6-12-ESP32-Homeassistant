@@ -1,3 +1,5 @@
+!!!! the original readme comes from https://github.com/jazzmonger !!!!
+
 Nemaxx P6, P9 or P12 Pellet Stove with Tuya TYWE1S chip flashed with ESPHome gives you COMPLETE local control over ALL stove functions (and adds some).
 
 The Discussions section also has LOTs of info: https://github.com/jazzmonger/wood-stove-with-TYWE1S-Tuya-chip/discussions
