@@ -69,34 +69,34 @@ uart:
             if (bytes.size()==5) {
                 if(bytes[0]==0xAA && bytes[1]==0x00) {
                 if(bytes[2]==0x20)
-                  id(MCUrawString).publish_state("Welcome to use");    
+                  id(MCUrawString).publish_state("Willkommen");    
                 if(bytes[2]==0x6A)
                   id(MCUrawString).publish_state("Goodbye!");              
                 if(bytes[2]==0x69)
-                  id(MCUrawString).publish_state("Cleaning");
+                  id(MCUrawString).publish_state("Reinigung");
                 if(bytes[2]==0x63)
-                  id(MCUrawString).publish_state("Cleaning");
+                  id(MCUrawString).publish_state("Reinigung");
                 if(bytes[2]==0x65)
-                  id(MCUrawString).publish_state("Lighting");
+                  id(MCUrawString).publish_state("Zuendung");
                 if(bytes[2]==0x66)
-                  id(MCUrawString).publish_state("Stabilization");
+                  id(MCUrawString).publish_state("Stabilisierung");
                 if(bytes[2]==0x62)
-                  id(MCUrawString).publish_state("Switching OFF");
+                  id(MCUrawString).publish_state("Ausschalten");
                 //if(bytes[2]==0x??) 
-                  //id(MCUrawString).publish_state("Cooling");                                 
+                  //id(MCUrawString).publish_state("Abkuehlen");                                 
               }              
             }
             //Some packets have 6 bytes
             if (bytes.size()==6) {
               if(bytes[1]==0x01 && bytes[2]==0x46 && bytes[3]==0x02) 
-                id(MCUrawString).publish_state("Welcome to use"); 
+                id(MCUrawString).publish_state("Willkommen"); 
                 //AA:00:59:CC:33
               if(bytes[1]==0x01 && bytes[2]==0x46 && bytes[3]==0x02) 
-                id(MCUrawString).publish_state("Switching off");                 
+                id(MCUrawString).publish_state("Ausschalten");                 
               if(bytes[1]==0x01 && bytes[2]==0x49 && bytes[3]==0x80) 
-                id(MCUrawString).publish_state("Stabilization"); 
+                id(MCUrawString).publish_state("Stabilisierung"); 
               if(bytes[1]==0x01 && bytes[2]==0x49 && bytes[3]==0x00) 
-                id(MCUrawString).publish_state("Stabilization"); 
+                id(MCUrawString).publish_state("Stabilisierung"); 
               if(bytes[1]==0x01 && bytes[2]==0x49 && bytes[3]==0x81) 
                 id(MCUrawString).publish_state("ECO2"); 
               if(bytes[1]==0x01 && bytes[2]==0x48 && bytes[3]==0x80) 
