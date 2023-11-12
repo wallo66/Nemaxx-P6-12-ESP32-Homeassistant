@@ -1,5 +1,6 @@
 #----------------------------------------------------------
 # TUYA WOOD PELLET STOVE Converted to ESP32
+# Germnay: Nemaxx P6, P9 and P12 with Nemaxx WiFi Modul
 # version; 3.1.0
 # date: 04-10-23 bug fixes
 # 3.0 converted to ESP32, added realtime exhaust sensor
@@ -25,9 +26,9 @@
 #----------------------------------------
 #
 substitutions:
-  device_name: "house-wood-pellet-stove"
-  device_description: House Pellet Stove running ESPHome ESP32D1Mini
-  friendly_name: House Wood Pellet Stove
+  device_name: "Nemaxx P6-12"
+  device_description: Nemaxx Pellet Stove running ESPHome ESP32D1Mini
+  friendly_name: Nemaxx Pellet Stove
   location: House
   lighting_count: "45" #sets max number of dumps of pellets during lighting
 #----------------------------------------------------------
