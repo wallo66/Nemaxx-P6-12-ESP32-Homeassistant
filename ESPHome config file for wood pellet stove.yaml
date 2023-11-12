@@ -1,0 +1,142 @@
+#----------------------------------------------------------
+# No physical mods required to the display to use this file other than to get it to flash this code.
+# Adds local sensors for all attributes previously in Tuya cloud
+#
+substitutions:
+  device_name: wood-pellet-stove
+  device_description: Wood Pellet Stove running ESPHome
+  friendly_name: Wood Pellet Stove
+#----------------------------------------------------------
+external_components:
+  - source: github://pr#4032
+    components: tuya
+    refresh: 0s
+esphome:
+  name: ${device_name}
+  comment: ${device_description}
+  platform: ESP8266
+  board: esp01_1m
+api:
+ota:
+wifi:
+  ssid: "REDACTED"
+  password: "REDACTED"
+  power_save_mode: none
+#
+# Enable Home Assistant API
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "House-Wood-Pellet-Stove"
+    password: "REDACTED"
+
+captive_portal:
+  
+time:
+  - platform: homeassistant
+    id: time_homeassistant
+    on_time_sync:
+      - component.update: sensor_uptime_timestamp
+      
+# Enable logging
+logger:
+  level: DEBUG
+#  baud_rate: 0
+
+uart:
+  rx_pin: GPIO13
+  tx_pin: GPIO15
+  baud_rate: 9600
+
+select:
+  - platform: "tuya"
+    tuya_id: "house"
+    name: "ESPH House Power Select"
+    enum_datapoint: 4
+    options:
+      0: P1
+      1: P2
+      2: P3
+      3: P4
+  - platform: "tuya"
+    tuya_id: "house"
+    name: "ESPH House ECO Select"
+    enum_datapoint: 101
+    options:
+      0: ECO1
+      1: ECO2
+
+##DATA POINT VALUES
+#1 - Power on (Heat)
+#4 - Mode P1/P2/P3P4
+#101 - ECO1/ECO2
+#104 - Error Code
+#106 Set Temp
+#107 - Current Temp
+#108 - Pipe Temp
+#109 - Protect Temp
+#-----------------
+#Datapoint 1: switch (value: OFF)
+#Datapoint 105: enum (value: 0)
+#Datapoint 4: enum (value: 0)
+#Datapoint 101: enum (value: 0)
+#Datapoint 106: int value (value: 68)
+#Datapoint 107: int value (value: 64)
+#Datapoint 108: int value (value: 68)
+#Datapoint 109: int value (value: 72)
+#Datapoint 104: bitmask (value: 0)
+#GPIO Configuration: status: pin 5, reset: pin 0
+#Product: '{"p":"8Dj5zVjGqPSXaUgf","v":"1.0.0","m":0}'
+
+# Register the Tuya MCU connection
+tuya:
+  id: "house"
+  
+#These arent needed but greatly help in debugging
+sensor:
+  - platform: "tuya"
+    name: "Stove-Power On"
+    sensor_datapoint: 1
+  - platform: "tuya"
+    name: "Stove-Error Code"
+    sensor_datapoint: 104
+  - platform: "tuya"   
+    name: "Stove-ECO Mode"
+    sensor_datapoint: 101
+  - platform: "tuya"
+    name: "Stove-Power Mode"
+    sensor_datapoint: 4
+  - platform: "tuya"
+    name: "Stove-DP#105"
+    sensor_datapoint: 105
+  - platform: "tuya"
+    name: "Stove-Set Temp"
+    sensor_datapoint: 106
+  - platform: "tuya"
+    name: "Stove-Current Temp"
+    sensor_datapoint: 107
+#
+  - platform: uptime
+    id: sensor_uptime
+#sensor:
+  - platform: wifi_signal
+    name: ${friendly_name} Signal
+    update_interval: 60s    
+  - platform: template
+    id: sensor_uptime_timestamp
+    name: "${friendly_name} Uptime"
+    device_class: "timestamp"
+    accuracy_decimals: 0
+    update_interval: never
+    lambda: |-
+      static float timestamp = (
+        id(time_homeassistant).utcnow().timestamp - id(sensor_uptime).state
+      );
+      return timestamp;
+#
+climate:
+  - platform: tuya
+    reports_fahrenheit: true #bug in these stoves required this fix
+    name: "Wood Pellet Stove"
+    switch_datapoint: 1
+    target_temperature_datapoint: 106
+    current_temperature_datapoint: 107

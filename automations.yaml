@@ -1,0 +1,184 @@
+alias: House Pellet Stove Turn on external Fan when Heating
+description: ""
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.esph_house_stove_pipe_temp
+    above: 275
+  - platform: numeric_state
+    entity_id: sensor.esph_house_stove_pipe_temp
+    below: 200
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.esph_house_stove_pipe_temp
+            above: 225
+        sequence:
+          - type: turn_on
+            entity_id: switch.house_stove_fan_socket_1
+            domain: switch
+          - service: switch.turn_on
+            data: {}
+            target:
+              entity_id: switch.house_stove_fan_socket_1
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.esph_house_stove_pipe_temp
+            below: 275
+        sequence:
+          - type: turn_off
+            entity_id: switch.house_stove_fan_socket_1
+            domain: switch
+          - service: switch.turn_off
+            data: {}
+            target:
+            
+              entity_id: switch.house_stove_fan_socket_1
+mode: single
+
+- id: '1669959141194'
+  alias: House Pellet stove HVAC 5:30 & 11am & 11:30pm
+  description: 'Set temps and modes on a schedule'
+  trigger:
+  - platform: time
+    at: 05:30:00
+    alias: 5:30am
+  - platform: time
+    at: '11:00:00'
+    alias: 11:00am
+  - platform: time
+    at: '23:30:00'
+    alias: 11:30pm
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: time
+        before: 06:00:00
+        after: 05:30:00
+        weekday:
+        - sat
+        - fri
+        - thu
+        - wed
+        - tue
+        - mon
+        - sun
+        alias: '@5:30am'
+      - condition: numeric_state
+        entity_id: sensor.stove_current_temp_sensor_smoothed
+        below: 68
+      sequence:
+      - service: climate.set_temperature
+        data:
+          temperature: 71
+        target:
+          entity_id: climate.house_wood_pellet_stove
+        alias: Set Temp 71
+      - service: select.select_option
+        data:
+          option: ECO2 - Px then P4
+        target:
+          entity_id: select.esph_house_eco_select
+        alias: 'ECO2 '
+      - service: select.select_option
+        data:
+          option: P4-Low
+        target:
+          entity_id: select.esph_house_power_select
+        alias: P4-Low
+    - conditions:
+      - condition: time
+        before: '11:30:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - fri
+        - thu
+        alias: '@11:30am'
+        after: '11:00:00'
+      sequence:
+      - service: climate.set_temperature
+        data:
+          temperature: 70
+        target:
+          entity_id: climate.house_wood_pellet_stove
+        alias: 70F
+      - service: select.select_option
+        data:
+          option: ECO1 - Heat then OFF
+        target:
+          entity_id: select.esph_house_eco_select
+        alias: ECO1
+      - service: select.select_option
+        data:
+          option: P4-Low
+        target:
+          entity_id: select.esph_house_power_select
+        alias: P4-Low
+    - conditions:
+      - condition: time
+        before: '23:59:00'
+        weekday:
+        - sun
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        after: '23:30:00'
+        alias: 11:30pm
+      sequence:
+      - service: climate.set_temperature
+        data:
+          temperature: 66
+        target:
+          entity_id: climate.house_wood_pellet_stove
+        alias: set 64F
+      - service: select.select_option
+        data:
+          option: ECO1 - Heat then OFF
+        target:
+          entity_id: select.esph_house_eco_select
+        alias: ECO1 - Heat then OFF
+      - service: select.select_option
+        data:
+          option: P4-Low
+        target:
+          entity_id: select.esph_house_power_select
+  - service: notify.mobile_app_jeffs_iphone_se
+    data:
+      message: '5:30am/11am/11:30 Temp change: Currently={{ states(''sensor.esph_house_stove_current_temp'')}}.
+        Set ={{states(''sensor.esph_house_stove_set_temp'')}}, {{states(''select.esph_house_eco_select'')}},
+        {{states(''select.esph_house_power_select'')}}'
+    enabled: false
+  - service: notify.mobile_app_jeffs_128gb_ipad
+    data:
+      message: '5:30am/11am/11:30 Temp change: Currently={{ states(''sensor.esph_house_stove_current_temp'')}}.
+        Set ={{states(''sensor.esph_house_stove_set_temp'')}}, {{states(''select.esph_house_eco_select'')}},
+        {{states(''select.esph_house_power_select'')}}'
+  mode: single
+
+- id: '1671411223240'
+  alias: House Stove Error Code Display
+  description: error code handler
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.esph_house_stove_error_code
+    above: 0
+  condition: []
+  action:
+  - service: notify.mobile_app_jeffs_iphone_se
+    data:
+      message: 'Stove Error ={{states(''sensor.esph_house_stove_current_temp'')}}.
+        Set ={{states(''sensor.esph_house_stove_set_temp'')}}, {{states(''select.esph_house_eco_select'')}},
+        {{states(''select.esph_house_power_select'')}}, Error: {{states(''sensor.esph_house_error_code_decoded'')}}'
+  - service: notify.mobile_app_jeffs_128gb_ipad
+    data:
+      message: 'Stove Error ={{states(''sensor.esph_house_stove_current_temp'')}}.
+        Set ={{states(''sensor.esph_house_stove_set_temp'')}}, {{states(''select.esph_house_eco_select'')}},
+        {{states(''select.esph_house_power_select'')}}, Error: {{states(''sensor.esph_house_error_code_decoded'')}}'
+  mode: single
